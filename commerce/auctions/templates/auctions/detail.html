@@ -1,0 +1,97 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {% for det in detail %}
+        {% if det.is_sold == True %}
+            Auction is closed
+        
+        {%else%}
+            <div class="card">
+                <img src="{{ det.image.url }}" alt="Headphone" style="width:20%">
+                <div class="container">
+                    Name: {{det.name}}<br>
+                    Description: {{det.description}}<br>
+                    Price: {{det.price}}<br><br>
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+
+
+    {% if user.is_authenticated %}
+        {% for det in detail %}
+            {% if det.is_sold == True %}
+                <br><br>
+            {%else%}
+                <!-- if det in list -->
+                {% if det in request.user.watch.all %}
+                    <form action = "{% url 'remove' %}", method = "POST">
+                        {% csrf_token %}
+                        <input type = "hidden", name = "name", value = "{{det.id}}">
+                        <button>Remove</button></a>
+                    </form><br>
+                {% else %}
+                    <form action = "{% url 'watchlist' %}", method = "POST">
+                        {% csrf_token %}
+                        <input type = "hidden", name = "name", value = "{{det.id}}">
+                        <button>Add to watchlist</button></a>
+                    </form><br>
+                {% endif %}
+            {%endif%}
+         {% endfor %}
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        {% for det in detail %}
+            {% if det.is_sold == True %}
+
+            {%else%}
+                <form action = "{% url 'bid' det.id %}", method = "POST">
+                    {% csrf_token %}
+                    <!--input type = "hidden", name = "name", value = "{{det.id}}"-->
+                    <input type="number" name="number" value="">
+                    <button>Bid</button><br><br>
+                </form>
+            {%endif%}
+        {% endfor %}
+    {% endif %}
+    
+    {% if user.is_authenticated %}
+        {% for det in detail %}
+            {% if det.is_sold == True %}
+
+            {%else%}
+                {% if det.created_by == request.user %}
+                    <form action = "{% url 'close'  %}", method = "POST">
+                        {% csrf_token %}
+                        <input type = "hidden", name = "name", value = "{{det.id}}">
+                        <button>Close</button><br><br>
+                    </form>
+                {% endif %}
+            {%endif%}
+        {% endfor %}
+    {% endif %}
+
+    {% if user.is_authenticated %}
+        {% if det.is_sold == True %}
+
+        {%else%}
+            {% for det in detail %}
+
+                <form action = "{% url 'comment' det.id %}", method = "POST">
+                    {% csrf_token %}
+                    <!--input type = "hidden", name = "name", value = "{{det.id}}"-->
+                    <textarea  name="textarea" rows="4" cols="50"></textarea><br>
+                    <button>Comment</button><br><br>
+                </form>
+
+                {%for comm in det.comment.all %}
+                    {{ comm.name }}
+                    <p>{{comm.comment}}</p>
+                {%endfor%}
+            {%endfor%}
+        {% endif %}
+        
+    {% endif %}
+
+{% endblock %}

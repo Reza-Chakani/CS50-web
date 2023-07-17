@@ -1,0 +1,16 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    {% for li in request.user.watch.all %}
+        <div class="card" style = "text-align:center">
+            <p style = "text-align:center;"><img src="{{ li.image.url }}" alt="Headphone" style="width:20%"></p>
+            <div class="container">
+                <a href = "{% url 'listing' li.id %}">Name: {{li.name}}</a><br>
+                Description: {{li.description}}<br>
+                Price: {{li.price}}<br><br>
+            </div>
+        </div>
+        
+    {% endfor %}
+{% endblock %}
+
